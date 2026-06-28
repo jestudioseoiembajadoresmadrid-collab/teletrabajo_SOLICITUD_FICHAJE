@@ -13,19 +13,18 @@
 
     main { padding: 30px 40px; display: flex; flex-direction: column; gap: 25px; }
 
-    /* Sección Solicitud */
     .solicitud-section { background: white; padding: 25px; border-radius: 20px; border-left: 8px solid var(--accent-color); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-    .instrucciones { color: #555; font-size: 0.95em; margin-bottom: 15px; background: #eef7f0; padding: 10px; border-radius: 8px; }
+    .instrucciones { color: #555; font-size: 0.95em; margin-bottom: 15px; background: #eef7f0; padding: 15px; border-radius: 8px; border: 1px solid #d1e7dd; }
+    .nota-importante { font-size: 0.9em; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ccc; color: #333; }
     
-    /* Calendario */
     .calendar-container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
     #calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 20px; }
     .day { height: 80px; border: 2px solid #eef2f5; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; transition: 0.3s; }
     .day.hoy { background: var(--main-color); color: white; border-color: var(--main-color); }
     .day.disabled { background: #f8f9fa; color: #ccc; cursor: not-allowed; }
     
-    .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
-    .modal-content { background: white; padding: 40px; border-radius: 20px; text-align: center; }
+    .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
+    .modal-content { background: white; padding: 40px; border-radius: 20px; text-align: center; width: 90%; max-width: 300px; }
     button { padding: 12px 25px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; }
   </style>
 </head>
@@ -40,7 +39,10 @@
     <section class="solicitud-section">
       <h2>Solicitud de días de teletrabajo</h2>
       <div class="instrucciones">
-        <strong>¡Importante!</strong> Para poder fichar, primero debes realizar la solicitud de los días deseados y esperar a que Jefatura los marque como "Concedido" en el sistema. Una vez concedido el permiso, pulsa sobre el día correspondiente en el calendario para registrar tu entrada o salida.
+        <strong>¡Importante!</strong> Primero solicita los días y espera a que Jefatura los marque como "Concedido". Una vez concedido, pulsa el día en el calendario para registrar tu entrada o salida.
+        <div class="nota-importante">
+          <em><strong>Nota:</strong> El teletrabajo está habilitado automáticamente los viernes, por lo que no es necesario realizar solicitud previa, <strong>SALVO EN PERIODO DE EVALUACIONES</strong>. Para el resto de los días, es imprescindible tener el permiso 'Concedido' en el sistema.</em>
+        </div>
       </div>
       <input type="date" id="fi" style="padding:10px;">
       <input type="date" id="ff" style="padding:10px;">
@@ -58,14 +60,14 @@
       <h2>Registro de Jornada</h2>
       <button style="background:var(--main-color); color:white; width:100%; margin-bottom:10px;" onclick="ejecutar('Entrada')">Registrar Entrada</button>
       <button style="background:#c62828; color:white; width:100%; margin-bottom:10px;" onclick="ejecutar('Salida')">Registrar Salida</button>
-      <button onclick="document.getElementById('modal').style.display='none'">Cancelar</button>
+      <button onclick="document.getElementById('modal').style.display='none'" style="background:#eee;">Cancelar</button>
     </div>
   </div>
 
   <script>
     const BACKEND_URL = "https://script.google.com/a/macros/educa.madrid.org/s/AKfycbxKFKJ4X1rvJBDjHR5lgecPvmDAVC7CJipZykzPxILO5zb9dvWfyGs9TMRKwEjH1f01xA/exec";
-    const cal = document.getElementById('calendar');
     
+    const cal = document.getElementById('calendar');
     ['L','M','X','J','V','S','D'].forEach(d => cal.innerHTML += `<div style="text-align:center; font-weight:bold">${d}</div>`);
     
     for(let i=1; i<=30; i++) {
@@ -73,7 +75,11 @@
       cal.innerHTML += `<div class="day ${isToday ? 'hoy' : 'disabled'}" ${isToday ? 'onclick="document.getElementById(\'modal\').style.display=\'flex\'"' : ''}>${i}</div>`;
     }
 
-    function ejecutar(tipo) { window.open(BACKEND_URL + "?tipo=" + tipo, "_blank"); }
+    function ejecutar(tipo) {
+      window.open(BACKEND_URL + "?tipo=" + tipo, "_blank");
+      document.getElementById('modal').style.display = 'none';
+    }
+
     function solicitar() {
       const fi = document.getElementById('fi').value;
       const ff = document.getElementById('ff').value;
