@@ -223,8 +223,8 @@
   </div>
 
   <script>
-    // URL de tu servidor de Google Apps Script actualizada
-    const BACKEND_URL = "https://script.google.com/a/macros/educa.madrid.org/s/AKfycbzg6TFxsvUMs8_59I-qHrwoycfBZ1mCN2wHfoYLCrK2pAa8LiPCri5VSF_rOX4TpjxDUg/exec";
+    // URL de tu servidor de Google Apps Script optimizada
+    const BACKEND_URL = "https://script.google.com/a/macros/educa.madrid.org/s/AKfycbxen7FfSWbrTSDwDZxS75bun_zMG9lgLDiWmWCaK4fCCE-LoAF2rQzsWGnCP-eHHdxOQQ/exec";
 
     const RANGO_MIN = new Date("2026-06-01T00:00:00");
     const RANGO_MAX = new Date("2027-06-30T23:59:59");
@@ -334,7 +334,6 @@
     function enviarSolicitud() {
       const fInicio = document.getElementById("fechaInicio").value;
       const fFin = document.getElementById("fechaFin").value;
-      const btn = document.getElementById("btnEnviarSol");
 
       if (!fInicio || !fFin) {
         alert("Por favor, rellene ambos campos de fecha.");
@@ -346,26 +345,14 @@
         return;
       }
 
-      btn.disabled = true;
-      btn.textContent = "Enviando...";
-
-      fetch(BACKEND_URL, {
-        method: "POST",
-        mode: "no-cors", 
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fechaInicio: fInicio, fechaFin: fFin })
-      })
-      .then(() => {
-        alert("¡Solicitud enviada!\nRevisa tu pestaña 'Control_Permisos' para ver si se ha añadido.");
-        cerrarModal('solicitudModal');
-      })
-      .catch(err => {
-        alert("Error al conectar: " + err.toString());
-      })
-      .finally(() => {
-        btn.disabled = false;
-        btn.textContent = "Enviar Solicitud";
-      });
+      // Redireccionamiento directo e infalible mediante canal doGet
+      const urlFinal = BACKEND_URL 
+        + "?action=solicitarPermiso" 
+        + "&fechaInicio=" + encodeURIComponent(fInicio) 
+        + "&fechaFin=" + encodeURIComponent(fFin);
+      
+      window.open(urlFinal, "_blank"); 
+      cerrarModal('solicitudModal');
     }
 
     function cerrarModal(idModal) {
