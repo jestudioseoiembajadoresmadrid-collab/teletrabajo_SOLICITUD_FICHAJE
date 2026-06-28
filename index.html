@@ -14,9 +14,8 @@
     .nota-importante { font-size: 0.9em; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ccc; color: #333; }
     .calendar-container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
     #calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 20px; }
-    .day { height: 80px; border: 2px solid #eef2f5; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; position: relative; }
+    .day { height: 80px; border: 2px solid #eef2f5; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; }
     .day.hoy { background: var(--main-color); color: white; border-color: var(--main-color); }
-    .day.concedido { background: #a4de02 !important; color: white !important; border-color: #a4de02 !important; }
     .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
     .modal-content { background: white; padding: 40px; border-radius: 20px; text-align: center; }
     button { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
@@ -40,14 +39,12 @@
       </div>
       <button onclick="agregarFila()" style="background:#eee;">+ Añadir otro día</button>
       <button onclick="solicitar()" style="background:var(--accent-color);">Enviar Solicitud</button>
-      <button onclick="consultarEstado()" style="background:#2196f3; color:white;">Consultar mis días concedidos</button>
     </section>
     <div class="calendar-container">
       <h3>Calendario de Junio 2026</h3>
       <div id="calendar"></div>
     </div>
   </main>
-  
   <div id="modal" class="modal">
     <div class="modal-content">
       <h2>Registro de Jornada</h2>
@@ -56,38 +53,14 @@
       <button onclick="document.getElementById('modal').style.display='none'">Cancelar</button>
     </div>
   </div>
-
   <script>
     const BACKEND_URL = "https://script.google.com/a/macros/educa.madrid.org/s/AKfycbxKFKJ4X1rvJBDjHR5lgecPvmDAVC7CJipZykzPxILO5zb9dvWfyGs9TMRKwEjH1f01xA/exec";
     const cal = document.getElementById('calendar');
     ['L','M','X','J','V','S','D'].forEach(d => cal.innerHTML += `<div style="text-align:center">${d}</div>`);
-    
-    // Generar calendario con restricción de solo hoy para fichar
     for(let i=1; i<=30; i++) {
       let isToday = (i === 28);
-      let diaId = i.toString().padStart(2, '0');
-      let html = `<div id="day-${diaId}" class="day ${isToday ? 'hoy' : ''}"`;
-      if (isToday) {
-        html += ` onclick="document.getElementById('modal').style.display='flex'">`;
-      } else {
-        html += ` onclick="alert('Solo puedes fichar el día de hoy.')">`;
-      }
-      html += `${i}</div>`;
-      cal.innerHTML += html;
+      cal.innerHTML += `<div class="day ${isToday ? 'hoy' : ''}" ${isToday ? 'onclick="document.getElementById(\'modal\').style.display=\'flex\'"' : ''}>${i}</div>`;
     }
-
-    function consultarEstado() {
-      google.script.run.withSuccessHandler(diasJson => {
-        let dias = JSON.parse(diasJson);
-        dias.forEach(d => {
-          let diaNum = d.split('-')[2];
-          let el = document.getElementById("day-" + diaNum);
-          if(el) el.classList.add('concedido');
-        });
-        alert("Tus días concedidos se han marcado en verde.");
-      }).consultarMisPermisos();
-    }
-
     function agregarFila() {
       const div = document.createElement('div');
       div.className = 'fecha-row';
