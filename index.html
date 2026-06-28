@@ -58,11 +58,9 @@
   </div>
 
   <script>
-    const BACKEND_URL = "https://script.google.com/a/macros/educa.madrid.org/s/AKfycbxKFKJ4X1rvJBDjHR5lgecPvmDAVC7CJipZykzPxILO5zb9dvWfyGs9TMRKwEjH1f01xA/exec";
     const cal = document.getElementById('calendar');
     ['L','M','X','J','V','S','D'].forEach(d => cal.innerHTML += `<div style="text-align:center">${d}</div>`);
     
-    // Generar calendario con restricción de solo hoy para fichar
     for(let i=1; i<=30; i++) {
       let isToday = (i === 28);
       let diaId = i.toString().padStart(2, '0');
@@ -101,10 +99,10 @@
         if(el.value) lista.push(el.value + " a " + el.value);
       });
       if(lista.length === 0) return alert("Selecciona al menos un día.");
-      window.open(BACKEND_URL + "?action=solicitarPermiso&fechas=" + lista.join("|"), "_blank");
+      google.script.run.withSuccessHandler(alert).solicitarPermiso(lista.join("|"));
     }
     function ejecutar(tipo) {
-      window.open(BACKEND_URL + "?tipo=" + tipo, "_blank");
+      google.script.run.withSuccessHandler(alert).procesarFichaje(tipo);
       document.getElementById('modal').style.display = 'none';
     }
   </script>
