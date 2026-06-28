@@ -2,57 +2,83 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>App de Fichaje - EOI Embajadores</title>
+  <title>Teletrabajo EOI EMBAJADORES</title>
   <style>
-    :root { --brand-primary: #1e5631; --brand-light: #a4de02; --success: #2e7d32; --danger: #c62828; }
-    body { font-family: sans-serif; background: #f1f5f9; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-    .container { background: white; padding: 20px; border-radius: 12px; width: 100%; max-width: 500px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    h1 { color: var(--brand-primary); font-size: 20px; text-align: center; }
-    .btn-group { display: flex; gap: 10px; margin-top: 20px; }
-    button { padding: 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; }
-    .btn-entrada { background: var(--success); color: white; }
-    .btn-salida { background: var(--danger); color: white; }
-    .btn-solicitar { background: var(--brand-light); color: #1e5631; margin-top: 10px; }
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
-    .modal-content { background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 400px; }
+    :root { --main-color: #1e5631; --accent-color: #a4de02; --bg-color: #f8f9fa; }
+    body { font-family: 'Segoe UI', sans-serif; background: var(--bg-color); margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+    
+    header { background: white; padding: 15px 40px; display: flex; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .logo { width: 60px; margin-right: 20px; }
+    h1 { color: var(--main-color); margin: 0; font-size: 24px; }
+
+    main { padding: 30px 40px; display: flex; flex-direction: column; gap: 25px; }
+
+    /* Sección Solicitud */
+    .solicitud-section { background: white; padding: 25px; border-radius: 20px; border-left: 8px solid var(--accent-color); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    .instrucciones { color: #555; font-size: 0.95em; margin-bottom: 15px; background: #eef7f0; padding: 10px; border-radius: 8px; }
+    
+    /* Calendario */
+    .calendar-container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+    #calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 20px; }
+    .day { height: 80px; border: 2px solid #eef2f5; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; transition: 0.3s; }
+    .day.hoy { background: var(--main-color); color: white; border-color: var(--main-color); }
+    .day.disabled { background: #f8f9fa; color: #ccc; cursor: not-allowed; }
+    
+    .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+    .modal-content { background: white; padding: 40px; border-radius: 20px; text-align: center; }
+    button { padding: 12px 25px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Teletrabajo EOI Embajadores</h1>
-    <div class="btn-group">
-      <button class="btn-entrada" onclick="fichar('Entrada')">Entrada</button>
-      <button class="btn-salida" onclick="fichar('Salida')">Salida</button>
-    </div>
-    <button class="btn-solicitar" onclick="abrirModal()">📝 Solicitar Teletrabajo</button>
-  </div>
 
-  <div id="solicitudModal" class="modal">
+  <header>
+    <img src="https://lh3.googleusercontent.com/d/1OxKQC2Y6WkgxgWSn3_v8U7DBvVfijXgt" class="logo" alt="Logo">
+    <h1>Teletrabajo EOI EMBAJADORES</h1>
+  </header>
+
+  <main>
+    <section class="solicitud-section">
+      <h2>Solicitud de días de teletrabajo</h2>
+      <div class="instrucciones">
+        <strong>¡Importante!</strong> Para poder fichar, primero debes realizar la solicitud de los días deseados y esperar a que Jefatura los marque como "Concedido" en el sistema. Una vez concedido el permiso, pulsa sobre el día correspondiente en el calendario para registrar tu entrada o salida.
+      </div>
+      <input type="date" id="fi" style="padding:10px;">
+      <input type="date" id="ff" style="padding:10px;">
+      <button onclick="solicitar()" style="background:var(--accent-color); color:var(--main-color)">Enviar Solicitud</button>
+    </section>
+
+    <div class="calendar-container">
+      <h3>Calendario de Junio 2026</h3>
+      <div id="calendar"></div>
+    </div>
+  </main>
+
+  <div id="modal" class="modal">
     <div class="modal-content">
-      <h2>Solicitar Permiso</h2>
-      <input type="date" id="fechaInicio" style="width:100%; margin-bottom:10px;">
-      <input type="date" id="fechaFin" style="width:100%; margin-bottom:10px;">
-      <button onclick="enviarSolicitud()" style="background:var(--brand-primary); color:white;">Enviar</button>
-      <button onclick="cerrarModal()">Cancelar</button>
+      <h2>Registro de Jornada</h2>
+      <button style="background:var(--main-color); color:white; width:100%; margin-bottom:10px;" onclick="ejecutar('Entrada')">Registrar Entrada</button>
+      <button style="background:#c62828; color:white; width:100%; margin-bottom:10px;" onclick="ejecutar('Salida')">Registrar Salida</button>
+      <button onclick="document.getElementById('modal').style.display='none'">Cancelar</button>
     </div>
   </div>
 
   <script>
-    const BACKEND_URL = "https://script.google.com/a/macros/educa.madrid.org/s/AKfycbzzXWStCEzapsW6q3mDEs_zH5iZk1JU2DpVL-i1fzdJuwrBH4pY6wvUFVzZUhuKhpSP0Q/exec";
-
-    function fichar(tipo) { window.open(BACKEND_URL + "?tipo=" + tipo, "_blank"); }
-    function abrirModal() { document.getElementById('solicitudModal').style.display = 'flex'; }
-    function cerrarModal() { document.getElementById('solicitudModal').style.display = 'none'; }
+    const BACKEND_URL = "https://script.google.com/a/macros/educa.madrid.org/s/AKfycbxKFKJ4X1rvJBDjHR5lgecPvmDAVC7CJipZykzPxILO5zb9dvWfyGs9TMRKwEjH1f01xA/exec";
+    const cal = document.getElementById('calendar');
     
-    function enviarSolicitud() {
-      const fInicio = document.getElementById('fechaInicio').value;
-      const fFin = document.getElementById('fechaFin').value;
-      if(!fInicio || !fFin) return alert("Completa las fechas");
-      
-      const urlFinal = BACKEND_URL + "?action=solicitarPermiso&fechaInicio=" + fInicio + "&fechaFin=" + fFin;
-      window.open(urlFinal, "_blank");
-      cerrarModal();
+    ['L','M','X','J','V','S','D'].forEach(d => cal.innerHTML += `<div style="text-align:center; font-weight:bold">${d}</div>`);
+    
+    for(let i=1; i<=30; i++) {
+      let isToday = (i === 28);
+      cal.innerHTML += `<div class="day ${isToday ? 'hoy' : 'disabled'}" ${isToday ? 'onclick="document.getElementById(\'modal\').style.display=\'flex\'"' : ''}>${i}</div>`;
+    }
+
+    function ejecutar(tipo) { window.open(BACKEND_URL + "?tipo=" + tipo, "_blank"); }
+    function solicitar() {
+      const fi = document.getElementById('fi').value;
+      const ff = document.getElementById('ff').value;
+      if(!fi || !ff) return alert("Por favor, selecciona las fechas.");
+      window.open(BACKEND_URL + "?action=solicitarPermiso&fechaInicio=" + fi + "&fechaFin=" + ff, "_blank");
     }
   </script>
 </body>
