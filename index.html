@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>App de Fichaje - Profesorado EducaMadrid</title>
+  
+  <style>
+    :root {
+      --brand-primary: #1e5631;       /* Verde bosque elegante */
+      --brand-light: #a4de02;         /* Verde lima brillante para detalles */
+      --brand-accent: #4c9a2a;        /* Verde medio interactivo */
+      --brand-hover: #143d22;         /* Verde oscuro para estados hover */
+      --success: #2e7d32;
+      --danger: #c62828;
+      --gray-base: #f8fafc;
+      --gray-border: #e2e8f0;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    
+    html, body {
+      margin: 0; padding: 0; width: 100%; height: 100%;
+      background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #1e293b; overflow: hidden;
+    }
+    
+    .container {
+      width: 100vw; height: 100vh; display: flex; flex-direction: column; padding: 20px; background: #fff;
+    }
+    
+    .header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 15px; padding-bottom: 12px; border-bottom: 2px solid var(--gray-border); flex-shrink: 0;
+    }
+    
+    .brand-box {
+      display: flex; align-items: center; gap: 15px;
+    }
+    
+    .logo-img {
+      height: 55px; width: auto; object-fit: contain;
+      border-radius: 4px;
+    }
+    
+    h1 { color: var(--brand-primary); font-size: 22px; margin: 0; font-weight: 700; letter-spacing: -0.5px; }
+    .sub { font-size: 13px; color: #64748b; margin: 3px 0 0 0; font-weight: 500; }
+    
+    .calendar-nav { display: flex; justify-content: center; align-items: center; gap: 20px; }
+    
+    .calendar-nav button { 
+      padding: 8px 16px; background: var(--brand-primary); color: white; 
+      border-radius: 6px; font-size: 14px; font-weight: 600; border: none; cursor: pointer;
+      transition: background 0.2s ease, transform 0.1s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .calendar-nav button:hover { background: var(--brand-hover); }
+    .calendar-nav button:active { transform: scale(0.98); }
+    
+    .month-title { 
+      font-size: 22px; 
+      font-weight: 800; 
+      text-transform: lowercase; 
+      min-width: 190px; 
+      text-align: center; 
+      color: var(--brand-primary);
+      letter-spacing: -0.3px;
+      text-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+    }
+
+    /* --- NUEVO BOTÓN DE SOLICITUD DE ALTA VISIBILIDAD --- */
+    .btn-solicitar {
+      background-color: var(--brand-light); 
+      color: #0f2d19; 
+      border: none;
+      padding: 10px 20px; 
+      font-size: 14px; 
+      font-weight: 800; 
+      border-radius: 8px; 
+      cursor: pointer;
+      box-shadow: 0 4px 6px -1px rgba(164, 222, 2, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex; 
+      align-items: center; 
+      gap: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .btn-solicitar:hover { 
+      background-color: #8cc202; 
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(164, 222, 2, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    .btn-solicitar:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .weekdays { 
+      display: table; width: 100%; text-align: center; font-weight: 700;  
+      background: var(--brand-primary); color: white; border-radius: 6px; flex-shrink: 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .weekday { display: table-cell; width: 14.28%; padding: 12px 0; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+    
+    .days-grid { display: flex; flex-direction: column; flex-grow: 1; margin-top: 10px; width: 100%; gap: 4px; }
+    .row { display: flex; width: 100%; flex-grow: 1; gap: 4px; }
+    
+    .day {
+      width: 14.28%; border: 1px solid var(--gray-border); font-size: 15px; font-weight: 600;
+      cursor: not-allowed; color: #94a3b8; background-color: var(--gray-base); padding: 10px;
+      display: flex; align-items: flex-start; justify-content: flex-start;
+      border-radius: 4px; transition: all 0.2s ease;
+    }
+    
+    .day.in-range { color: #334155; background-color: #fff; }
+    
+    .day.hoy {
+      background: linear-gradient(135deg, #fffde6 0%, #fef9c3 100%) !important;
+      border: 2.5px solid var(--brand-accent) !important; color: var(--brand-primary); cursor: pointer;
+      box-shadow: inset 0 0 8px rgba(76, 154, 42, 0.15), 0 4px 6px -1px rgba(0,0,0,0.05);
+      font-size: 18px;
+    }
+    .day.hoy:hover { 
+      background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%) !important;
+      transform: translateY(-1px);
+      box-shadow: inset 0 0 8px rgba(76, 154, 42, 0.2), 0 10px 15px -3px rgba(0,0,0,0.08);
+    }
+    
+    /* Modales flotantes */
+    .modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 1000;
+    }
+    
+    .modal-content {
+      background: white; padding: 35px; border-radius: 12px; max-width: 440px; width: 90%; 
+      text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+      border-top: 6px solid var(--brand-primary);
+    }
+    
+    .modal h2 { margin-top: 0; font-size: 24px; color: var(--brand-primary); font-weight: 700; }
+    .btn-group { display: flex; gap: 15px; margin-top: 25px; }
+    
+    .modal button { 
+      padding: 14px 22px; font-size: 15px; font-weight: 700; border: none; 
+      border-radius: 8px; cursor: pointer; transition: all 0.2s ease;
+    }
+    .btn-entrada { background-color: var(--success); color: white; width: 100%; box-shadow: 0 2px 4px rgba(46,125,50,0.2); }
+    .btn-entrada:hover { background-color: #1b5e20; transform: translateY(-1px); }
+    
+    .btn-salida { background-color: var(--danger); color: white; width: 100%; box-shadow: 0 2px 4px rgba(198,40,40,0.2); }
+    .btn-salida:hover { background-color: #b71c1c; transform: translateY(-1px); }
+    
+    .btn-close { 
+      background-color: #64748b; color: white; margin-top: 20px; padding: 10px; 
+      font-size: 14px; width: 100%; font-weight: 600;
+    }
+    .btn-close:hover { background-color: #475569; }
+
+    /* Estilos específicos para el Formulario de Solicitudes */
+    .form-group { text-align: left; margin-bottom: 15px; }
+    .form-group label { display: block; font-size: 14px; font-weight: 700; color: #475569; margin-bottom: 5px; }
+    .form-group input { width: 100%; padding: 10px; border: 1px solid var(--gray-border); border-radius: 6px; font-size: 15px; font-family: inherit; }
+    .form-group input:focus { outline: none; border-color: var(--brand-accent); }
+    .btn-enviar-solicitud { background-color: var(--brand-primary); color: white; width: 100%; margin-top: 10px; }
+    .btn-enviar-solicitud:hover { background-color: var(--brand-hover); }
+    .btn-enviar-solicitud:disabled { background-color: #cbd5e1; cursor: not-allowed; }
+    
+    .version-tag { width: 170px; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+    .v-text { font-size: 11px; color: #94a3b8; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <div class="brand-box">
+        <img class="logo-img" src="https://lh3.googleusercontent.com/d/1OxKQC2Y6WkgxgWSn3_v8U7DBvVfijXgt" alt="Logo Centro" onerror="this.style.display='none';">
+        <div>
+          <h1>Teletrabajo EOI EMBAJADORES</h1>
+          <p class="sub">Personal DOCENTE</p>
+        </div>
+      </div>
+      
+      <div class="calendar-nav">
+        <button id="btnPrev" onclick="cambiarMes(-1)">◀ Anterior</button>
+        <div id="monthTitle" class="month-title"></div>
+        <button id="btnNext" onclick="cambiarMes(1)">Siguiente ▶</button>
+      </div>
+      
+      <div class="version-tag">
+        <button class="btn-solicitar" onclick="abrirModalSolicitud()">📝 Solicitar Permiso</button>
+        <span class="v-text">v5.0 Request System</span>
+      </div>
+    </div>
+
+    <div class="weekdays">
+      <div class="weekday">Lunes</div>
+      <div class="weekday">Martes</div>
+      <div class="weekday">Miércoles</div>
+      <div class="weekday">Jueves</div>
+      <div class="weekday">Viernes</div>
+      <div class="weekday">Sábado</div>
+      <div class="weekday">Domingo</div>
+    </div>
+
+    <div id="daysGrid" class="days-grid"></div>
+  </div>
+
+  <div id="fichajeModal" class="modal">
+    <div class="modal-content">
+      <h2>Validar Identidad y Fichar</h2>
+      <p id="modalFechaTexto" style="font-size:16px; margin: 5px 0 20px 0; color:#475569; font-weight: 600;"></p>
+      <p style="font-size: 13px; color: #64748b; margin-bottom: 15px; line-height: 1.4;">Se abrirá una ventana segura bajo el entorno institucional para registrar la acción en tu jornada laboral.</p>
+      
+      <div class="btn-group">
+        <button class="btn-entrada" onclick="redireccionarFichaje('Entrada')">Fichar Entrada ↗</button>
+        <button class="btn-salida" onclick="redireccionarFichaje('Salida')">Fichar Salida ↗</button>
+      </div>
+      
+      <button class="btn-close" onclick="cerrarModal('fichajeModal')">Volver al Calendario</button>
+    </div>
+  </div>
+
+  <div id="solicitudModal" class="modal">
+    <div class="modal-content">
+      <h2>Solicitud de Periodo de Teletrabajo</h2>
+      <p style="font-size: 13px; color: #64748b; margin-bottom: 20px; line-height: 1.4;">Introduce las fechas deseadas. Tu solicitud se guardará en estado pendiente hasta ser revisada por Jefatura.</p>
+      
+      <div class="form-group">
+        <label for="fechaInicio">Fecha de Inicio:</label>
+        <input type="date" id="fechaInicio">
+      </div>
+      
+      <div class="form-group">
+        <label for="fechaFin">Fecha de Finalización:</label>
+        <input type="date" id="fechaFin">
+      </div>
+      
+      <button id="btnEnviarSol" class="btn-enviar-solicitud" onclick="enviarSolicitud()">Enviar Solicitud</button>
+      <button class="btn-close" onclick="cerrarModal('solicitudModal')">Cancelar</button>
+    </div>
+  </div>
+
+  <script>
+    const BACKEND_URL = "https://script.google.com/a/macros/educa.madrid.org/s/AKfycbx_I-K8o0X82YF-N8iP3qH0r1Fw8m5L_9zZ3xK_7XJ6r6m9M8v7U-xN_lM/exec";
+
+    const RANGO_MIN = new Date("2026-06-01T00:00:00");
+    const RANGO_MAX = new Date("2027-06-30T23:59:59");
+
+    let fechaActualVista = new Date();
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const hoy = new Date();
+      if (hoy < RANGO_MIN) {
+        fechaActualVista = new Date(2026, 5, 1);
+      } else if (hoy > RANGO_MAX) {
+        fechaActualVista = new Date(2027, 5, 1);
+      }
+      renderizarCalendario();
+    });
+
+    // Código JavaScript intacto y funcional...
+    function renderizarCalendario() {
+      const grid = document.getElementById("daysGrid");
+      const title = document.getElementById("monthTitle");
+      grid.textContent = ""; 
+
+      const año = fechaActualVista.getFullYear();
+      const mes = fechaActualVista.getMonth();
+
+      title.textContent = fechaActualVista.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }).toLowerCase();
+
+      const primerDiaMes = new Date(año, mes, 1);
+      const ultimoDiaMes = new Date(año, mes + 1, 0);
+
+      let diaInicioSemana = primerDiaMes.getDay() - 1;
+      if (diaInicioSemana === -1) diaInicioSemana = 6;
+
+      const totalDias = ultimoDiaMes.getDate();
+      const hoy = new Date();
+
+      let diaContador = 1;
+      let filaActual = document.createElement("div");
+      filaActual.classList.add("row");
+
+      for (let i = 0; i < diaInicioSemana; i++) {
+        let celdaVacia = document.createElement("div");
+        celdaVacia.classList.add("day");
+        filaActual.appendChild(celdaVacia);
+      }
+
+      while (diaContador <= totalDias) {
+        if (filaActual.children.length === 7) {
+          grid.appendChild(filaActual);
+          filaActual = document.createElement("div");
+          filaActual.classList.add("row");
+        }
+
+        const celdaDia = document.createElement("div");
+        celdaDia.classList.add("day");
+        celdaDia.textContent = diaContador;
+
+        const fechaCelda = new Date(año, mes, diaContador);
+
+        if (fechaCelda >= RANGO_MIN && fechaCelda <= RANGO_MAX) {
+          celdaDia.classList.add("in-range");
+          
+          if (fechaCelda.getDate() === hoy.getDate() && 
+              fechaCelda.getMonth() === hoy.getMonth() && 
+              fechaCelda.getFullYear() === hoy.getFullYear()) {
+            celdaDia.classList.add("hoy");
+            celdaDia.addEventListener("click", () => abrirModalFichaje(fechaCelda));
+          }
+        }
+
+        filaActual.appendChild(celdaDia);
+        diaContador++;
+      }
+
+      while (filaActual.children.length < 7) {
+        let celdaVacia = document.createElement("div");
+        celdaVacia.classList.add("day");
+        filaActual.appendChild(celvacia);
+      }
+      grid.appendChild(filaActual);
+    }
+
+    function cambiarMes(direccion) {
+      fechaActualVista.setMonth(fechaActualVista.getMonth() + direccion);
+      renderizarCalendario();
+    }
+
+    function abrirModalFichaje(fecha) {
+      document.getElementById("modalFechaTexto").textContent = fecha.toLocaleDateString('es-ES', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
+      document.getElementById("fichajeModal").style.display = "flex";
+    }
+
+    function abrirModalSolicitud() {
+      document.getElementById("fechaInicio").value = "";
+      document.getElementById("fechaFin").value = "";
+      document.getElementById("solicitudModal").style.display = "flex";
+    }
+
+    function redireccionarFichaje(tipo) {
+      const parametroTipo = encodeURIComponent(tipo.trim());
+      const urlFinal = BACKEND_URL + "?tipo=" + parametroTipo;
+      window.open(urlFinal, "_blank"); 
+      cerrarModal('fichajeModal');
+    }
+
+    function enviarSolicitud() {
+      const fInicio = document.getElementById("fechaInicio").value;
+      const fFin = document.getElementById("fechaFin").value;
+      const btn = document.getElementById("btnEnviarSol");
+
+      if (!fInicio || !fFin) {
+        alert("Por favor, rellene ambos campos de fecha.");
+        return;
+      }
+
+      if (new Date(fInicio) > new Date(fFin)) {
+        alert("La fecha de inicio no puede ser posterior a la fecha de finalización.");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Enviando...";
+
+      fetch(BACKEND_URL, {
+        method: "POST",
+        mode: "no-cors", 
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fechaInicio: fInicio, fechaFin: fFin })
+      })
+      .then(() => {
+        alert("¡Solicitud enviada!\nSe ha guardado en la base de datos en estado 'Pendiente'. Jefatura de Estudios recibirá tu petición.");
+        cerrarModal('solicitudModal');
+      })
+      .catch(err => {
+        alert("Error al conectar con el servidor: " + err.toString());
+      })
+      .finally(() => {
+        btn.disabled = false;
+        btn.textContent = "Enviar Solicitud";
+      });
+    }
+
+    function cerrarModal(idModal) {
+      document.getElementById(idModal).style.display = "none";
+    }
+  </script>
+</body>
+</html>
