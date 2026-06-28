@@ -5,50 +5,76 @@
   <title>Teletrabajo EOI EMBAJADORES</title>
   <style>
     :root { --main-color: #1e5631; --accent-color: #a4de02; --bg-color: #f8f9fa; }
-    body { font-family: 'Segoe UI', sans-serif; background: var(--bg-color); margin: 0; padding: 20px; }
-    .section { background: white; padding: 20px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-    button { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin: 5px; }
-    #estado-permiso { padding: 15px; border-radius: 10px; font-weight: bold; margin-bottom: 20px; text-align: center; }
+    body { font-family: 'Segoe UI', sans-serif; background: var(--bg-color); margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+    header { background: white; padding: 15px 40px; display: flex; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    h1 { color: var(--main-color); margin: 0; font-size: 24px; }
+    main { padding: 30px 40px; display: flex; flex-direction: column; gap: 25px; }
+    .section { background: white; padding: 25px; border-radius: 20px; border-left: 8px solid var(--accent-color); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    .instrucciones { color: #555; font-size: 0.95em; margin-bottom: 15px; background: #eef7f0; padding: 15px; border-radius: 8px; border: 1px solid #d1e7dd; }
+    .nota-importante { font-size: 0.9em; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ccc; color: #333; }
+    .calendar-container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+    #calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 20px; }
+    .day { height: 80px; border: 2px solid #eef2f5; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; }
+    .day.hoy { background: var(--main-color); color: white; border-color: var(--main-color); }
+    .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
+    .modal-content { background: white; padding: 40px; border-radius: 20px; text-align: center; }
+    button { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
   </style>
 </head>
 <body>
-  <h1>Teletrabajo EOI EMBAJADORES</h1>
-  <div id="estado-permiso">Consultando permiso...</div>
-  
-  <section class="section">
-    <h2>Solicitar Teletrabajo</h2>
-    <div id="container-fechas">
-      <div>Inicio: <input type="date" class="fi"> Fin: <input type="date" class="ff"></div>
-    </div>
-    <button onclick="agregarFila()" style="background:#eee;">+ Añadir periodo</button>
-    <button onclick="solicitar()" style="background:var(--accent-color);">Enviar Solicitud</button>
-  </section>
 
-  <section class="section">
-    <h2>Registro de Jornada</h2>
-    <button style="background:var(--main-color); color:white;" onclick="ejecutar('Entrada')">Registrar Entrada</button>
-    <button style="background:#c62828; color:white;" onclick="ejecutar('Salida')">Registrar Salida</button>
-  </section>
+  <header><h1>Teletrabajo EOI EMBAJADORES</h1></header>
+
+  <main>
+    <section class="section">
+      <h2>Solicitar periodos de teletrabajo</h2>
+      <div class="instrucciones">
+        <strong>¡Importante!</strong> Primero solicita los días y espera a que Jefatura los marque como "Concedido". Una vez concedido, pulsa el día en el calendario para registrar tu entrada o salida.
+        <div class="nota-importante">
+          <em><strong>Nota:</strong> El teletrabajo está habilitado automáticamente los viernes, por lo que no es necesario realizar solicitud previa, <strong>SALVO EN PERIODO DE EVALUACIONES</strong>. Para el resto de los días, es imprescindible tener el permiso 'Concedido' en el sistema.</em>
+        </div>
+      </div>
+      
+      <div id="container-fechas">
+        <div class="periodo-row" style="margin-bottom: 10px;">
+          Inicio: <input type="date" class="fi"> Fin: <input type="date" class="ff">
+        </div>
+      </div>
+      <button onclick="agregarFila()" style="background:#eee;">+ Añadir periodo</button>
+      <button onclick="solicitar()" style="background:var(--accent-color);">Enviar Solicitud</button>
+    </section>
+
+    <div class="calendar-container">
+      <h3>Calendario de Junio 2026</h3>
+      <div id="calendar"></div>
+    </div>
+  </main>
+
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <h2>Registro de Jornada</h2>
+      <button style="background:var(--main-color); color:white;" onclick="ejecutar('Entrada')">Registrar Entrada</button>
+      <button style="background:#c62828; color:white;" onclick="ejecutar('Salida')">Registrar Salida</button>
+      <button onclick="document.getElementById('modal').style.display='none'">Cancelar</button>
+    </div>
+  </div>
 
   <script>
     const BACKEND_URL = "https://script.google.com/a/macros/educa.madrid.org/s/AKfycbxKFKJ4X1rvJBDjHR5lgecPvmDAVC7CJipZykzPxILO5zb9dvWfyGs9TMRKwEjH1f01xA/exec";
     
-    window.onload = () => {
-      google.script.run.withSuccessHandler(actualizarUI).obtenerEstadoPermiso();
-    };
-
-    function actualizarUI(estado) {
-      const box = document.getElementById('estado-permiso');
-      if(estado === "AUTOMATICO" || estado === "CONCEDIDO") {
-        box.style.background = "#d1e7dd"; box.innerHTML = "✅ Permiso activo para hoy: " + estado;
-      } else {
-        box.style.background = "#f8d7da"; box.innerHTML = "❌ No tienes permiso para hoy.";
-      }
+    // Generar calendario
+    const cal = document.getElementById('calendar');
+    ['L','M','X','J','V','S','D'].forEach(d => cal.innerHTML += `<div style="text-align:center">${d}</div>`);
+    for(let i=1; i<=30; i++) {
+      let isToday = (i === 28);
+      cal.innerHTML += `<div class="day ${isToday ? 'hoy' : ''}" ${isToday ? 'onclick="document.getElementById(\'modal\').style.display=\'flex\'"' : ''}>${i}</div>`;
     }
 
     function agregarFila() {
       const div = document.createElement('div');
-      div.innerHTML = '<br>Inicio: <input type="date" class="fi"> Fin: <input type="date" class="ff">';
+      div.className = 'periodo-row';
+      div.style.marginBottom = '10px';
+      div.innerHTML = 'Inicio: <input type="date" class="fi"> Fin: <input type="date" class="ff">';
       document.getElementById('container-fechas').appendChild(div);
     }
 
@@ -57,11 +83,13 @@
       document.querySelectorAll('.fi').forEach((el, i) => {
         if(el.value) lista.push(el.value + " a " + document.querySelectorAll('.ff')[i].value);
       });
+      if(lista.length === 0) return alert("Selecciona al menos un periodo.");
       window.open(BACKEND_URL + "?action=solicitarPermiso&fechas=" + lista.join("|"), "_blank");
     }
 
     function ejecutar(tipo) {
       window.open(BACKEND_URL + "?tipo=" + tipo, "_blank");
+      document.getElementById('modal').style.display = 'none';
     }
   </script>
 </body>
