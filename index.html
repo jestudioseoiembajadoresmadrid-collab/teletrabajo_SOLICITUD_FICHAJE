@@ -19,23 +19,19 @@
     .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
     .modal-content { background: white; padding: 40px; border-radius: 20px; text-align: center; }
     button { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-    .fecha-input { padding: 8px; border: 1px solid #ccc; border-radius: 5px; }
   </style>
 </head>
 <body>
-
   <header><h1>Teletrabajo EOI EMBAJADORES</h1></header>
-
   <main>
     <section class="section">
       <h2>Solicitar días de teletrabajo</h2>
       <div class="instrucciones">
-        <strong>¡Importante!</strong> Selecciona el día (o añade varios días) y espera a que Jefatura los marque como "Concedido(s)". Una vez concedido, pulsa el día en el calendario para registrar tu entrada o salida.
+        <strong>¡Importante!</strong> Selecciona el día o días y espera a que Jefatura los marque como "Concedido". Una vez concedido, pulsa el día en el calendario para registrar entrada o salida.
         <div class="nota-importante">
-          <em><strong>Nota:</strong> El teletrabajo está habilitado automáticamente los viernes, <strong>salvo en periodos de evaluaciones</strong>. Para el resto de días, es imprescindible tener el permiso 'CONCEDIDO'.</em>
+          <em><strong>Nota:</strong> El teletrabajo está habilitado automáticamente los viernes, por lo que no es necesario realizar solicitud previa, <strong>SALVO EN PERIODO DE EVALUACIONES</strong>. Para el resto de los días, es imprescindible tener el permiso 'Concedido' en el sistema.</em>
         </div>
       </div>
-      
       <div id="container-fechas">
         <div class="fecha-row" style="margin-bottom: 10px;">
           Día: <input type="date" class="fecha-solicitud">
@@ -44,13 +40,11 @@
       <button onclick="agregarFila()" style="background:#eee;">+ Añadir otro día</button>
       <button onclick="solicitar()" style="background:var(--accent-color);">Enviar Solicitud</button>
     </section>
-
     <div class="calendar-container">
       <h3>Calendario de Junio 2026</h3>
       <div id="calendar"></div>
     </div>
   </main>
-
   <div id="modal" class="modal">
     <div class="modal-content">
       <h2>Registro de Jornada</h2>
@@ -59,18 +53,14 @@
       <button onclick="document.getElementById('modal').style.display='none'">Cancelar</button>
     </div>
   </div>
-
   <script>
     const BACKEND_URL = "https://script.google.com/a/macros/educa.madrid.org/s/AKfycbxKFKJ4X1rvJBDjHR5lgecPvmDAVC7CJipZykzPxILO5zb9dvWfyGs9TMRKwEjH1f01xA/exec";
-    
-    // Generar calendario básico
     const cal = document.getElementById('calendar');
     ['L','M','X','J','V','S','D'].forEach(d => cal.innerHTML += `<div style="text-align:center">${d}</div>`);
     for(let i=1; i<=30; i++) {
       let isToday = (i === 28);
       cal.innerHTML += `<div class="day ${isToday ? 'hoy' : ''}" ${isToday ? 'onclick="document.getElementById(\'modal\').style.display=\'flex\'"' : ''}>${i}</div>`;
     }
-
     function agregarFila() {
       const div = document.createElement('div');
       div.className = 'fecha-row';
@@ -78,19 +68,14 @@
       div.innerHTML = 'Día: <input type="date" class="fecha-solicitud">';
       document.getElementById('container-fechas').appendChild(div);
     }
-
     function solicitar() {
       let lista = [];
       document.querySelectorAll('.fecha-solicitud').forEach((el) => {
-        if(el.value) {
-          // Enviamos el mismo valor como inicio y fin para que tu backend lo procese como un único día
-          lista.push(el.value + " a " + el.value);
-        }
+        if(el.value) lista.push(el.value + " a " + el.value);
       });
       if(lista.length === 0) return alert("Selecciona al menos un día.");
       window.open(BACKEND_URL + "?action=solicitarPermiso&fechas=" + lista.join("|"), "_blank");
     }
-
     function ejecutar(tipo) {
       window.open(BACKEND_URL + "?tipo=" + tipo, "_blank");
       document.getElementById('modal').style.display = 'none';
