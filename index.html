@@ -7,10 +7,10 @@
   
   <style>
     :root {
-      --brand-primary: #1e5631;       /* Verde bosque elegante */
-      --brand-light: #a4de02;         /* Verde lima brillante para detalles */
-      --brand-accent: #4c9a2a;        /* Verde medio interactivo */
-      --brand-hover: #143d22;         /* Verde oscuro para estados hover */
+      --brand-primary: #1e5631;       
+      --brand-light: #a4de02;         
+      --brand-accent: #4c9a2a;        
+      --brand-hover: #143d22;         
       --success: #2e7d32;
       --danger: #c62828;
       --gray-base: #f8fafc;
@@ -67,7 +67,6 @@
       text-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
     }
 
-    /* --- NUEVO BOTÓN DE SOLICITUD DE ALTA VISIBILIDAD --- */
     .btn-solicitar {
       background-color: var(--brand-light); 
       color: #0f2d19; 
@@ -89,10 +88,6 @@
       background-color: #8cc202; 
       transform: translateY(-2px);
       box-shadow: 0 10px 15px -3px rgba(164, 222, 2, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    }
-    .btn-solicitar:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     
     .weekdays { 
@@ -120,13 +115,7 @@
       box-shadow: inset 0 0 8px rgba(76, 154, 42, 0.15), 0 4px 6px -1px rgba(0,0,0,0.05);
       font-size: 18px;
     }
-    .day.hoy:hover { 
-      background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%) !important;
-      transform: translateY(-1px);
-      box-shadow: inset 0 0 8px rgba(76, 154, 42, 0.2), 0 10px 15px -3px rgba(0,0,0,0.08);
-    }
     
-    /* Modales flotantes */
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 1000;
@@ -145,26 +134,18 @@
       padding: 14px 22px; font-size: 15px; font-weight: 700; border: none; 
       border-radius: 8px; cursor: pointer; transition: all 0.2s ease;
     }
-    .btn-entrada { background-color: var(--success); color: white; width: 100%; box-shadow: 0 2px 4px rgba(46,125,50,0.2); }
-    .btn-entrada:hover { background-color: #1b5e20; transform: translateY(-1px); }
+    .btn-entrada { background-color: var(--success); color: white; width: 100%; }
+    .btn-entrada:hover { background-color: #1b5e20; }
     
-    .btn-salida { background-color: var(--danger); color: white; width: 100%; box-shadow: 0 2px 4px rgba(198,40,40,0.2); }
-    .btn-salida:hover { background-color: #b71c1c; transform: translateY(-1px); }
+    .btn-salida { background-color: var(--danger); color: white; width: 100%; }
+    .btn-salida:hover { background-color: #b71c1c; }
     
-    .btn-close { 
-      background-color: #64748b; color: white; margin-top: 20px; padding: 10px; 
-      font-size: 14px; width: 100%; font-weight: 600;
-    }
-    .btn-close:hover { background-color: #475569; }
+    .btn-close { background-color: #64748b; color: white; margin-top: 20px; padding: 10px; font-size: 14px; width: 100%; }
 
-    /* Estilos específicos para el Formulario de Solicitudes */
     .form-group { text-align: left; margin-bottom: 15px; }
     .form-group label { display: block; font-size: 14px; font-weight: 700; color: #475569; margin-bottom: 5px; }
-    .form-group input { width: 100%; padding: 10px; border: 1px solid var(--gray-border); border-radius: 6px; font-size: 15px; font-family: inherit; }
-    .form-group input:focus { outline: none; border-color: var(--brand-accent); }
+    .form-group input { width: 100%; padding: 10px; border: 1px solid var(--gray-border); border-radius: 6px; font-size: 15px; }
     .btn-enviar-solicitud { background-color: var(--brand-primary); color: white; width: 100%; margin-top: 10px; }
-    .btn-enviar-solicitud:hover { background-color: var(--brand-hover); }
-    .btn-enviar-solicitud:disabled { background-color: #cbd5e1; cursor: not-allowed; }
     
     .version-tag { width: 170px; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
     .v-text { font-size: 11px; color: #94a3b8; font-weight: 600; }
@@ -211,7 +192,6 @@
     <div class="modal-content">
       <h2>Validar Identidad y Fichar</h2>
       <p id="modalFechaTexto" style="font-size:16px; margin: 5px 0 20px 0; color:#475569; font-weight: 600;"></p>
-      <p style="font-size: 13px; color: #64748b; margin-bottom: 15px; line-height: 1.4;">Se abrirá una ventana segura bajo el entorno institucional para registrar la acción en tu jornada laboral.</p>
       
       <div class="btn-group">
         <button class="btn-entrada" onclick="redireccionarFichaje('Entrada')">Fichar Entrada ↗</button>
@@ -225,7 +205,7 @@
   <div id="solicitudModal" class="modal">
     <div class="modal-content">
       <h2>Solicitud de Periodo de Teletrabajo</h2>
-      <p style="font-size: 13px; color: #64748b; margin-bottom: 20px; line-height: 1.4;">Introduce las fechas deseadas. Tu solicitud se guardará en estado pendiente hasta ser revisada por Jefatura.</p>
+      <p style="font-size: 13px; color: #64748b; margin-bottom: 20px;">Introduce las fechas deseadas.</p>
       
       <div class="form-group">
         <label for="fechaInicio">Fecha de Inicio:</label>
@@ -243,7 +223,8 @@
   </div>
 
   <script>
-    const BACKEND_URL = "https://script.google.com/a/macros/educa.madrid.org/s/AKfycbx_I-K8o0X82YF-N8iP3qH0r1Fw8m5L_9zZ3xK_7XJ6r6m9M8v7U-xN_lM/exec";
+    // URL de tu servidor de Google Apps Script actualizada
+    const BACKEND_URL = "https://script.google.com/a/macros/educa.madrid.org/s/AKfycbzg6TFxsvUMs8_59I-qHrwoycfBZ1mCN2wHfoYLCrK2pAa8LiPCri5VSF_rOX4TpjxDUg/exec";
 
     const RANGO_MIN = new Date("2026-06-01T00:00:00");
     const RANGO_MAX = new Date("2027-06-30T23:59:59");
@@ -260,7 +241,6 @@
       renderizarCalendario();
     });
 
-    // Código JavaScript intacto y funcional...
     function renderizarCalendario() {
       const grid = document.getElementById("daysGrid");
       const title = document.getElementById("monthTitle");
@@ -321,7 +301,7 @@
       while (filaActual.children.length < 7) {
         let celdaVacia = document.createElement("div");
         celdaVacia.classList.add("day");
-        filaActual.appendChild(celvacia);
+        filaActual.appendChild(celdaVacia);
       }
       grid.appendChild(filaActual);
     }
@@ -376,11 +356,11 @@
         body: JSON.stringify({ fechaInicio: fInicio, fechaFin: fFin })
       })
       .then(() => {
-        alert("¡Solicitud enviada!\nSe ha guardado en la base de datos en estado 'Pendiente'. Jefatura de Estudios recibirá tu petición.");
+        alert("¡Solicitud enviada!\nRevisa tu pestaña 'Control_Permisos' para ver si se ha añadido.");
         cerrarModal('solicitudModal');
       })
       .catch(err => {
-        alert("Error al conectar con el servidor: " + err.toString());
+        alert("Error al conectar: " + err.toString());
       })
       .finally(() => {
         btn.disabled = false;
