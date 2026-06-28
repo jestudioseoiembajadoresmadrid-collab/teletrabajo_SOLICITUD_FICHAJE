@@ -44,6 +44,11 @@
       <button onclick="agregarFila()" style="background:#eee;">+ Añadir otro día</button>
       <button onclick="solicitar()" style="background:var(--accent-color);">Enviar Solicitud</button>
     </section>
+    <section class="section" style="margin-top: 20px;">
+  <h2>Consulta de Permisos</h2>
+  <button onclick="consultarPermisos()" style="background:#555; color:white;">Ver mis días concedidos</button>
+  <div id="listaPermisos" style="margin-top: 15px; font-size: 0.9em; color: #333;"></div>
+</section>
 
     <div class="calendar-container">
       <h3>Calendario de Junio 2026</h3>
@@ -95,6 +100,27 @@
       window.open(BACKEND_URL + "?tipo=" + tipo, "_blank");
       document.getElementById('modal').style.display = 'none';
     }
+    
+    function consultarPermisos() {
+  const divLista = document.getElementById('listaPermisos');
+  divLista.innerHTML = "Cargando...";
+  
+  google.script.run
+    .withSuccessHandler(function(permisos) {
+      divLista.innerHTML = "";
+      if (permisos.length === 0) {
+        divLista.innerHTML = "No tienes permisos concedidos actualmente.";
+      } else {
+        let html = "<ul>";
+        permisos.forEach(p => {
+          html += `<li><strong>${p.inicio}</strong> al <strong>${p.fin}</strong></li>`;
+        });
+        html += "</ul>";
+        divLista.innerHTML = html;
+      }
+    })
+    .obtenerMisPermisos();
+}
   </script>
 </body>
 </html>
